@@ -196,7 +196,7 @@ class preparedsqls{
                                                                                 <input data-text=".$accesorios['id']."  class ='btnsw btn$idcaso' type='checkbox' data-off-color='danger' data-on-color='info' data-size='large' data-on-text='' data-off-text='' checked>  
                                                                             </div>
                                                                             <div class='col-lg-4'>
-                                                                                <textarea class='txtarea' id=".$accesorios['id']." rows='2' cols='40'></textarea>  
+                                                                                <textarea maxlength='90' class='txtarea txtarea$idcaso' id=".$accesorios['id']." rows='2' cols='40'></textarea>  
                                                                             </div>
                                                                           </div>
                                                                           ";
@@ -206,11 +206,11 @@ class preparedsqls{
                             
                             $html = $html."</div>                       
                                                                     <div class='col-lg-12'>
-                                                                        <div class='alert alert-warning' style='margin-left: 2%; margin-right: 2%;'role='alert'>
+                                                                        <div id=divprocaso$idcaso class='alert alert-warning' style='margin-left: 2%; margin-right: 2%;'role='alert'>
                                                                           <span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span>
                                                                           <span class='sr-only'>Error:</span>
                                                                           Verifique los datos para poder procesar el caso, ya que no se podrá deshacer la accion...
-                                                                          <a data-text='$idcaso' class='btnprocaso btn btn-info btn-lg'><i class='glyphicon glyphicon-ok'>Procesar</i></a>
+                                                                          <a data-text='$idcaso'  class='btnprocaso btn btn-info btn-lg'><i class='glyphicon glyphicon-ok'>Procesar</i></a>
                                                                         </div>
                                                                         <div style='margin-top:-1%;margin-bottom: 1%;margin-left: 2%;margin-right: 2%;' class='page-header'></div>
                                                                     </div>
@@ -259,7 +259,27 @@ class preparedsqls{
             echo $out;
         }
         
-        
+        public function obtenerCasosProcesados($evento){
+             $sql=("SELECT DISTINCT solicitudes_accesorios_id as casosprocid FROM seguimientos WHERE tipo_estado_id = 2;");
+            
+            $result = $this->con->query($sql,2);
+            $arr = array();
+             $arr2 = array();
+            $cont = 0;
+            //$arr["casosproc"]  = "casosprocid"
+            foreach ($result as $key => $value) {
+                   foreach ($value as $ky => $val) {
+                    $cont++; 
+                    $arr2[$cont]=$val;
+                   }
+            }
+            $arr["casosproc"]  = $arr2;
+            $out = json_encode($arr);
+            //$this->desconectarSigesp();
+            echo $out;
+        }
+
+
         public function ejecutar($sql,$evento){
      			
                         $res= $this->con->query($sql);
@@ -273,7 +293,7 @@ class preparedsqls{
                         else{
                             $result = array("respuesta"=>"Registrado","evento"=>$evento);
                         }
-                        echo json_encode($result);
+                        return json_encode($result);
                         
      		
      		

@@ -49,7 +49,7 @@ function selectAgencia(data){
                    $("#"+$($(".btn"+idcaso)[i]).attr("data-text")).attr( "style","");
                    if ($($(".btn"+idcaso)[i]).bootstrapSwitch('state')){
                         obsercaso = $("#"+$($(".btn"+idcaso)[i]).attr("data-text")).val();    
-                        accesorios[i]=[true,$($(".btn"+idcaso)[i]).attr("data-text"),"1"];
+                        accesorios[i]=[true,$($(".btn"+idcaso)[i]).attr("data-text"),""];
                    
                    }
                    else{
@@ -70,7 +70,8 @@ function selectAgencia(data){
                 }
                 else{
                     if (confirm('¿Esta seguro que desea procesar este caso?, no se prodrá deshacer esta acción..')) {
-                        // Save it!
+                        console.log(caso);
+                        ajax(caso);
                     } else {
                         // Do nothing!
                     }
@@ -78,8 +79,18 @@ function selectAgencia(data){
         //console.log(accesorios.length);
                                     
     }); 
+    
+    casosproc={};
+    casosproc["action"]="buscarCasosProc";
+    //console.log(casosproc);
+    ajax(casosproc);
 }
 
+function desabilitarElementos(caso){
+    $(".btn"+caso).bootstrapSwitch('disabled',true);
+    $("#divprocaso"+caso).hide();
+    $(".txtarea"+caso).attr("disabled",true)
+}
 
 function ajax(datos,tipodato){
     
@@ -99,14 +110,14 @@ function ajax(datos,tipodato){
           //alert("Error");
         },
         success:function(resp, textStatus, jqXHR){
-                    //console.log(resp) ;
+          //         console.log(resp) ;
           
                 switch (resp.evento) {
                  
                  case "guardar":
                    
                      if (resp.respuesta.error){
-                            console.log(resp.respuesta);
+                          //  console.log(resp.respuesta);
                         if (resp.respuesta.codeerror==23505){
                             alert("Ya este registro Existe");
                             break;
@@ -126,10 +137,15 @@ function ajax(datos,tipodato){
                      }
                     
                         break;
+                case "procesarCaso":
+                        //console.log(resp)
+                        desabilitarElementos(resp.respuesta);
+                    
+                        break;
                 case "obtenerCasosGenerales":
                         $("#agentes").html("")
                         if (resp.respuesta.length==0){
-                            console.log(resp.respuesta);
+                           // console.log(resp.respuesta);
                             $("#sincasos").show();                            
                         }else{
                             $("#sincasos").hide();  
@@ -138,10 +154,19 @@ function ajax(datos,tipodato){
                         
                     
                         break;
+                
                 default:
                         break;
                 }
-                
+                if (resp.hasOwnProperty("casosproc")){
+                $.each(resp.casosproc,function(key,val){
+                       // console.log(key+"->"+val);
+                        console.log(val)
+                        desabilitarElementos(val);
+                       
+                   });
+                // console.log(resp);    
+                }
                 if (resp.hasOwnProperty("Materiales")){
                    $.each(resp.Materiales,function(key,val){
                        // console.log(key+"->"+val);
