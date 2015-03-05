@@ -18,9 +18,9 @@ function selectAgencia(data){
     datos={};
     datos["action"]="obtenerCasosGenerales";
     datos["data"]=data[0];
-    //console.log(data);
-    
     ajax(datos);
+    
+    
     $(".btnsw").bootstrapSwitch('state',false, true);
     $(".btnsw").bootstrapSwitch().on("switchChange.bootstrapSwitch", function (event, state) {
         //alert("Switch pressed");
