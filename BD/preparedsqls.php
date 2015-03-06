@@ -193,7 +193,7 @@ class preparedsqls{
                                                                             </div>
                                                                             <div class=' make-switch col-lg-2'>
                                                                             
-                                                                                <input data-text=".$accesorios['id']."  class ='btnsw btn$idcaso' type='checkbox' data-off-color='danger' data-on-color='info' data-size='large' data-on-text='' data-off-text='' checked>  
+                                                                                <input data-text=".$accesorios['id']." id=btnsw".$accesorios['id']." class ='btnsw btn$idcaso' type='checkbox' data-off-color='danger' data-on-color='info' data-size='large' data-on-text='' data-off-text='' checked>  
                                                                             </div>
                                                                             <div class='col-lg-4'>
                                                                                 <textarea maxlength='90' class='txtarea txtarea$idcaso' id=".$accesorios['id']." rows='2' cols='40'></textarea>  
@@ -272,6 +272,13 @@ class preparedsqls{
                     $cont++; 
                     $arr2[$cont]=$val;
                    }
+            }
+            $sql= ("select * from tipos_articulos");
+           
+            $result2 = $this->con->query($sql,2);
+            $arr3 = array();
+            foreach ($result as $row => $valor) {
+                $arr3[]  = $valor;							
             }
             $arr["casosproc"]  = $arr2;
             $out = json_encode($arr);
