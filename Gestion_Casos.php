@@ -132,7 +132,7 @@ and open the template in the editor.
     <body>
         <div class="container">
             
-            <header></header>
+            
             <h1>Gestión de Casos</h1>
             <div class='panel panel-default'>
                 <div class='panel-heading'>

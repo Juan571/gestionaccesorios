@@ -32,10 +32,22 @@
         case $action === 'obtenerCasosGenerales': 
             $ejecuta->obtenerCasosGenerales($action,$_POST['data']);
         break;
+    
+        case $action === 'despacharAcc':
+            $idagencia=$_POST['agenciiaid'];    
+            $idcaso = $_POST['casoid'];
+           
+            $sql = ("INSERT INTO seguimientos VALUES (null,now(), 3, $idcaso, 'despachado','$idagencia','0');"); 
+            $ejecuta->ejecutar($sql,$action);
+            $result = array("respuesta"=>$idcaso,"evento"=>$action);
+            
+            echo json_encode($result);
+            
+        break;
      
         case $action === 'procesarCaso': 
                 $accesorios=$_POST['accesorios'];    
-                $idcaso = $_POST['idcaso'];
+                $idcaso = $_POST['casoid'];
             
                 for ($i=0;$i<count($accesorios);$i++){
                     $id = $accesorios[$i][1];

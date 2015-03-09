@@ -30,6 +30,7 @@ class preparedsqls{
         public function obtenerCasosGenerales($action,$data){
             $sql=("SELECT * FROM  agencias where agencia_id = $data");            
             $result = $this->con->query($sql,2);
+            $htmlfinal="";
             
             
             
@@ -42,7 +43,7 @@ class preparedsqls{
                         </div>
                         <div class='panel-body'>";
                 
-               $sql=("SELECT 
+               $sql=("SELECT distinct
                        solicitudes_accesorios.id as id,
                        solicitantes.nombres as nombres,
                        solicitantes.apellidos as apellidos,
@@ -57,7 +58,8 @@ class preparedsqls{
                        operadoras.operadora as operadora,
                        tecnologias.tecnologia as tec,
                        equipos.imei as imei,
-                       equipos.serial as serial
+                       equipos.serial as serial,
+                       usuarios.agencia_id as agenciaid
                        
 
                         FROM postventa_accesorios.solicitudes_accesorios
@@ -69,7 +71,7 @@ class preparedsqls{
                         join colores on (equipos.color_id = colores.id)
                         join operadoras on (equipos.operadora_id = operadoras.id)
                         join tecnologias on (equipos.tecnologia_id = tecnologias.id)
-
+                        
                         where agencias.id = ".$ofc['id'].";");            
                         $casos = $this->con->query($sql,2);
                         $numeroCasos = 0;
@@ -169,18 +171,26 @@ class preparedsqls{
                                                         solicitud_accesorios_id,
                                                         solicitudes_accesorios_inventario.id as id,
                                                         solicitudes_accesorios_inventario.descripcion as descripcion,
-                                                        solicitudes_accesorios_inventario.descripcion as apŕobado,
+                                                        solicitudes_accesorios_inventario.aprobado as aprobado,
                                                         inventario.producto as producto,
-                                                        motivos_reemplazo.motivo as motivo
+                                                        motivos_reemplazo.motivo as motivo,
+                                                        seguimientos.observaciones as observaciones
+                                                        
                                                         FROM postventa_accesorios.solicitudes_accesorios_inventario 
                                                         join motivos_reemplazo on (motivos_reemplazo.id = solicitudes_accesorios_inventario.motivo_id)
                                                         join inventario on (solicitudes_accesorios_inventario.inventario_id = inventario.id)
-                                                        where solicitud_accesorios_id = ".$idcaso.";");            
+                                                        left join seguimientos on (seguimientos.solicitudes_accesorios_inventario_id=solicitudes_accesorios_inventario.id)
+                                                        where solicitud_accesorios_id =".$idcaso.";");            
                                                         
                                                 $accesorios = $this->con->query($sql,2);
                                                          
                                                         foreach ($accesorios as $nacc => $accesorios) {
-                                                             
+                                                            $aprob="";
+                                                              if ($accesorios['aprobado']=='1'){
+                                                                  $aprob="checked";
+                                                              }
+                                                              
+                                                                                
                                                              $html=$html."<div class='col-lg-12'>
                                                                             <div class='col-lg-2'>
                                                                                 ".$accesorios['producto']."                                         
@@ -192,11 +202,11 @@ class preparedsqls{
                                                                                 ".$accesorios['motivo']."   
                                                                             </div>
                                                                             <div class=' make-switch col-lg-2'>
-                                                                            
-                                                                                <input data-text=".$accesorios['id']." id=btnsw".$accesorios['id']." class ='btnsw btn$idcaso' type='checkbox' data-off-color='danger' data-on-color='info' data-size='large' data-on-text='' data-off-text='' checked>  
+                                                                                <input data-text=".$accesorios['id']." id=btnsw".$accesorios['id']." class ='btnsw btn$idcaso' type='checkbox' data-off-color='danger' data-on-color='info' data-size='large' data-on-text='' data-off-text='' $aprob>
+                                                                                
                                                                             </div>
                                                                             <div class='col-lg-4'>
-                                                                                <textarea maxlength='90' class='txtarea txtarea$idcaso' id=".$accesorios['id']." rows='2' cols='40'></textarea>  
+                                                                                <textarea maxlength='90' class='txtarea txtarea$idcaso' id=".$accesorios['id']." rows='2' cols='40'>".$accesorios['observaciones']."</textarea>  
                                                                             </div>
                                                                           </div>
                                                                           ";
@@ -214,20 +224,20 @@ class preparedsqls{
                                                                         </div>
                                                                         <div style='margin-top:-1%;margin-bottom: 1%;margin-left: 2%;margin-right: 2%;' class='page-header'></div>
                                                                     </div>
-                                                                    <div class='col-lg-12'>
+                                                                    <div style='display:none' id='divdesp$idcaso' class='col-lg-12'>
                                                                             <div style='text-align: left;'>
                                                                                 <label >DESPACHAR MERCANCIA:</label>
                                                                             </div> 
                                                                             <label >Indique hacia donde se van a despachar los accesorios</label>
                                                                             <div style='display: inline-block;' class='radio'>
                                                                               <label>
-                                                                                <input type='radio' name='opciones' id='opciones_1' value='opcion_1' checked>
+                                                                                <input type='radio' name='opcionesdesp$idcaso' id='opciones_aa_$idcaso' value='".$datosCasos['agenciaid']."'>
                                                                                ".$ofc['agencia']."
                                                                               </label>
                                                                             </div>
                                                                             <div style='display: inline-block;' class='radio'>
                                                                               <label>
-                                                                                <input type='radio' name='opciones' id='opciones_2' value='opcion_2'>
+                                                                                <input type='radio' name='opcionesdesp$idcaso' id='opciones_ofc_$idcaso' value='agencia'>
                                                                                     Oficina Comercial 
                                                                                 </label>
                                                                             </div>
@@ -235,7 +245,7 @@ class preparedsqls{
                                                                               <span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span>
                                                                               <span class='sr-only'>Error:</span>
                                                                               Verifique los datos para poder despachar los accesorios, ya que no se podrá deshacer la accion...
-                                                                              <a class='btn btn-warning btn-lg'><i class='glyphicon glyphicon-shopping-cart'>Despachar</i></a>
+                                                                              <a id='btndesp$idcaso' data-text=$idcaso class='btn btn-warning btn-lg btndesp'><i class='glyphicon glyphicon-shopping-cart'>Despachar</i></a>
                                                                             </div>
                                                                             <div style='margin-top:-1%;margin-bottom: 1%;margin-left: 2%;margin-right: 2%;' class='page-header'></div>
 

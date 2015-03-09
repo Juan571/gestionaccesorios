@@ -21,7 +21,7 @@ function selectAgencia(data){
     ajax(datos);
     
     
-    $(".btnsw").bootstrapSwitch('state',false, true);
+   // $(".btnsw").bootstrapSwitch('state',false, true);
     $(".btnsw").bootstrapSwitch().on("switchChange.bootstrapSwitch", function (event, state) {
         //alert("Switch pressed");
         if(state){
@@ -33,6 +33,36 @@ function selectAgencia(data){
     });
     $('.bootstrap-switch-handle-on').attr("class", "glyphicon glyphicon-ok-sign bootstrap-switch-handle-on bootstrap-switch-info");
     $('.bootstrap-switch-handle-off').attr("class", "glyphicon glyphicon-remove bootstrap-switch-handle-on bootstrap-switch-danger");
+    
+    $('.btndesp').on("click",function () {
+       
+        porNombre=document.getElementsByName("opcionesdesp"+$(this).attr("data-text"));
+        // Recorremos todos los valores del radio button para encontrar el
+        lugardesp="nada";
+        for(var i=0;i<porNombre.length;i++)
+        {
+            if(porNombre[i].checked)
+                lugardesp=porNombre[i].value;
+        }
+        
+        if(lugardesp=='agencia'){
+            lugardesp=data[0]
+        }
+        if(lugardesp=='nada'){
+            alert("Seleccione la oficina de Despacho..");
+        }else{
+            despachar={};
+            despachar["action"]="despacharAcc";
+            despachar["agenciiaid"]=lugardesp;
+            despachar["casoid"]=$(this).attr("data-text");
+            console.log(despachar); 
+            ajax(despachar);            
+        }
+        //$(".btnsw")[1].bootstrapSwitch('state')
+        
+    });
+    
+    
     $('.btnprocaso').on("click",function () {
         idcaso = $(this).attr("data-text");
         ncasos = $($(".btn"+idcaso)).length;
@@ -42,7 +72,7 @@ function selectAgencia(data){
                 var caso={};
                 var h=0;
                 caso["action"]='procesarCaso';
-                caso["idcaso"]=idcaso;
+                caso["casoid"]=idcaso;
                 
                 for (i=0;i< ncasos;i++){
                    //console.log($($(".btn"+idcaso)[i]).bootstrapSwitch('state'));
@@ -89,7 +119,19 @@ function selectAgencia(data){
 function desabilitarElementos(caso){
     $(".btn"+caso).bootstrapSwitch('disabled',true);
     $("#divprocaso"+caso).hide();
-    $(".txtarea"+caso).attr("disabled",true)
+    $(".txtarea"+caso).attr("disabled",true);
+   
+    nacc=$(".btn"+caso).length;
+    booldespachar=false;
+    for(i=0;i<nacc;i++){
+         if($(".btn"+caso)[i].checked){
+           booldespachar=true;  
+         }
+    }
+    console.log(booldespachar);
+    if(booldespachar){
+        $("#divdesp"+caso).show();
+    }
 }
 
 function ajax(datos,tipodato){
@@ -135,6 +177,15 @@ function ajax(datos,tipodato){
                         cargarTablas("obtenerEstados", "", "#tablaEstadosActividades", null, [0],"./Clases/modelEstadosActividad.php");
                         alert("Registrado Exitosamente..");
                      }
+                    
+                        break;
+                        
+                 case "despacharAcc":
+                        console.log(resp)
+                       $("#divdesp"+resp.respuesta).hide();
+                            alert("Despachado exitosamente")
+                        
+                        
                     
                         break;
                 case "procesarCaso":
